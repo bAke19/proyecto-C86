@@ -12,17 +12,12 @@ import { View,
          KeyboardAvoidingView, 
          Alert} from "react-native";
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, CameraType, CameraCapturedPicture } from 'expo-camera';
+import { Camera, CameraType} from 'expo-camera';
 import { RFValue } from "react-native-responsive-fontsize";
-import CameraPost from "./CameraPost";
 
-import {initializeApp} from "firebase/app";
-import {getAuth, onAuthStateChanged} from "firebase/auth";
-import { firebaseConfig} from "../config";
-import {getStorage, ref, uploadBytes} from "firebase/storage"
-         
-const app =  initializeApp(firebaseConfig);
-const storage = getStorage(app);
+import {onAuthStateChanged} from "firebase/auth";
+import { storage, authPerfil} from "../config";
+import {ref, uploadBytes} from "firebase/storage"
 
 export default class CreatePost extends Component{
     constructor(props){
@@ -41,12 +36,10 @@ export default class CreatePost extends Component{
     }
 
     componentDidMount(){
-      const auth =  getAuth();
-      onAuthStateChanged(auth, (user)=>{
+      onAuthStateChanged(authPerfil, (user)=>{
         this.setState({
           uid: user.uid
         })
-        console.log(user.uid)
       })
     }
 
@@ -62,13 +55,6 @@ export default class CreatePost extends Component{
         
     }
 
-    
-
-    toggleCameraType = () => {
-        return this.setState({ cameraType: this.state.cameraType === CameraType.back ? CameraType.front : CameraType.back})
-        //return await Camera.takePictureAsync()
-    }
-
     pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -77,6 +63,7 @@ export default class CreatePost extends Component{
           quality: 1,
         });
 
+        console.log(result.assets[0].fileName)
         var newImageHeight = result.assets[0].height/5
     
         if (!result.canceled) {
@@ -109,9 +96,11 @@ export default class CreatePost extends Component{
 
     uploadImage = async (file) =>{
 
+      var date = new Date().toString()
+
       const fetchRequest = await fetch(file);
       const theblob = await fetchRequest.blob()
-      const imageRef =  ref(storage, 'imagen');
+      const imageRef =  ref(storage, this.state.uid +'/' + date);
 
       uploadBytes(imageRef, theblob).then((snapshot) => {
         console.log('Uploaded a blob or file!');

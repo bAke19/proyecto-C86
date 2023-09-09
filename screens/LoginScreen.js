@@ -8,12 +8,8 @@ import { View,
          Alert
          } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
-import {signInWithEmailAndPassword, getAuth} from "firebase/auth";
-import {initializeApp} from "firebase/app";
-import { firebaseConfig} from "../config";
-
-const app =  initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import {signInWithEmailAndPassword} from "firebase/auth";
+import { auth } from "../config";
 
 export default class LoginScreen extends Component{
     constructor(props){
@@ -34,9 +30,6 @@ export default class LoginScreen extends Component{
         })
     }
 
-    singInGoogle = async () => {
-        
-    }
     render(){
         return(
             <View style={styles.container}>
